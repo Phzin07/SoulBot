@@ -1,0 +1,57 @@
+public class SoulGemini extends Robot {
+  // Radar range for enemy detection
+  private final double RADAR_RANGE = 400;
+
+  // Fire power for normal and bomb attacks
+  private final double NORMAL_FIRE = 3;
+  private final double BOMB_FIRE = 10;
+
+  // Scan data to track enemies
+  private RobotData nearestEnemy;
+
+  public void run() {
+    // Set color and turn radar continuously
+    setBodyColor(new Color(0, 255, 255)); // Cyan
+    setTurnRadarRight(RADAR_RANGE);
+
+    while (true) {
+      // Update scan data and find closest enemy
+      nearestEnemy = getScannedRobotInfo();
+      
+      // Check if there's an enemy
+      if (nearestEnemy != null) {
+        // Enemy detected! Track and attack
+        double enemyX = nearestEnemy.getX();
+        double enemyY = nearestEnemy.getY();
+        double angleToEnemy = getHeadingTo(enemyX, enemyY);
+        
+        // Turn gun towards enemy
+        turnGunRight(getHeading() - angleToEnemy);
+
+        // Fire based on distance
+        double distance = getDistance(enemyX, enemyY);
+        if (distance < 100) {
+          fire(BOMB_FIRE); // Fire bomb at close range
+        } else {
+          fire(NORMAL_FIRE); // Fire guided shot
+        }
+        
+        // Move perpendicular to enemy for dodging
+        setTurnRight(getHeading() - angleToEnemy + 90);
+        ahead(100); // Move forward
+      } else {
+        // No enemy detected, scan and turn
+        turnRight(45);
+      }
+      
+      // Simulate lightning strike (large damage to all)
+      if (Math.random() < 0.1) {
+        setFire(BOMB_FIRE * 2); // Simulate large blast
+      }
+    }
+  }
+
+  public void onHitByBullet(BulletHitEvent event) {
+    // Simulate shield effect by ignoring damage
+  }
+}
