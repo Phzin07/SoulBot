@@ -1,0 +1,73 @@
+import robocode.*;
+import java.awt.Color;
+
+public class SoulChatGPT extends AdvancedRobot {
+
+    boolean shieldActive = false;
+
+    public void run() {
+        setColors(Color.cyan, Color.black, Color.cyan); // Define as cores do robô
+        setAdjustGunForRobotTurn(true); // Permite ajustar a arma independentemente do movimento do robô
+        setAdjustRadarForGunTurn(true); // Permite ajustar o radar independentemente da posição da arma
+        while (true) {
+            // Mantém o radar girando constantemente
+            turnRadarRight(Double.POSITIVE_INFINITY);
+        }
+    }
+
+    public void onScannedRobot(ScannedRobotEvent e) {
+        // Mantém o radar trancado no inimigo
+        double radarTurn = getHeadingRadians() + e.getBearingRadians() - getRadarHeadingRadians();
+        setTurnRadarRightRadians(Utils.normalRelativeAngle(radarTurn));
+
+        // Calcula a direção e a quantidade de energia necessária para girar em direção ao inimigo
+        double absBearing = getHeadingRadians() + e.getBearingRadians();
+        double turn = absBearing - getGunHeadingRadians();
+        setTurnGunRightRadians(Utils.normalRelativeAngle(turn));
+
+        // Ativa o escudo se o inimigo estiver atirando
+        if (e.getDistance() < 300 && e.getEnergy() > 0 && !shieldActive) {
+            activateShield();
+        }
+
+        // Atira no inimigo
+        setFire(3); // Fogo máximo
+
+        // Move-se para frente para evitar ser atingido
+        setAhead(100);
+    }
+
+    public void onHitByBullet(HitByBulletEvent e) {
+        // Ignora o dano da bala se o escudo estiver ativo
+        if (!shieldActive) {
+            // Se não estiver usando o escudo, recua para evitar mais danos
+            setBack(100);
+        }
+    }
+
+    public void onHitWall(HitWallEvent e) {
+        // Ao atingir a parede, vira-se para longe dela
+        setTurnRight(90);
+        setAhead(100);
+    }
+
+    // Método para ativar o escudo
+    private void activateShield() {
+        shieldActive = true;
+        // Configura a cor do robô para indicar que o escudo está ativo
+        setBodyColor(Color.blue);
+        setGunColor(Color.blue);
+        setRadarColor(Color.blue);
+        setScanColor(Color.blue);
+    }
+
+    // Método para desativar o escudo
+    private void deactivateShield() {
+        shieldActive = false;
+        // Restaura as cores originais do robô
+        setBodyColor(Color.cyan);
+        setGunColor(Color.cyan);
+        setRadarColor(Color.cyan);
+        setScanColor(Color.cyan);
+    }
+}
