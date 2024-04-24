@@ -2,8 +2,8 @@
 package br.com.etec;
 import robocode. *;
 
-//SoulBot = // oque quiser
-public class SoulBot extends Robot
+//SoulChatgpt= // oque quiser
+public class SoulChatgpt extends Robot
 {
     public void run(){
         //Cor do Robo
