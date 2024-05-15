@@ -3,7 +3,7 @@ package myrobots;
 import robocode.*;
 import java.awt.Color;
 
-public class AdvancedBot extends AdvancedRobot {
+public class Eduarda extends AdvancedRobot {
 
     @Override
     public void run() {
